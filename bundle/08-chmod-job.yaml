@@ -1,0 +1,31 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: chmod-volumes
+  namespace: kube-system
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - sh
+            - -c
+            - chmod -R 777 /data
+            name: chmod-local-volumes
+            image: busybox
+            volumeMounts:
+              - mountPath: /data
+                name: data-to-chmod
+                readOnly: false
+            securityContext:
+              runAsNonRoot: false
+              runAsUser: 0
+          volumes:
+            - hostPath:
+                path: /opt/local-path-provisioner/
+              name: data-to-chmod
+          restartPolicy: OnFailure

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: traefikv2
+  name: traefik-ingress-controller
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: traefikv2
+  name: traefik
+  labels:
+    app: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '6969'
+        prometheus.io/path: '/metrics'
+    spec:
+      hostNetwork: true
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - name: traefik
+          image: traefik:v2.3
+          args:
+            - --api.insecure
+            - --api.dashboard=true
+            - --accesslog
+            - --entrypoints.http.Address=:80
+            - --entrypoints.https.Address=:443
+            - --entrypoints.metrics.Address=:6969
+            - --providers.kubernetescrd
+            - --metrics.prometheus.entrypoint=metrics
+            - --serversTransport.insecureSkipVerify=true
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: dashboard
+              containerPort: 8080
+            - name: metrics
+              containerPort: 6969
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: ingress-controller
+                operator: In
+                values:
+                - "true"

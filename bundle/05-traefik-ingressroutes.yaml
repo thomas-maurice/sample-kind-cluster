@@ -1,0 +1,39 @@
+# example middlewares
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  namespace: traefikv2
+  name: ip-any
+spec:
+  ipWhiteList:
+    sourceRange:
+    - 0.0.0.0/0
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  namespace: traefikv2
+  name: redirect-https
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  entryPoints:
+    - http
+  routes:
+  - match: Host(`dashboard.localhost`)
+    kind: Rule
+    middlewares:
+    services:
+    - name: kubernetes-dashboard
+      port: 443
+      scheme: http
+---

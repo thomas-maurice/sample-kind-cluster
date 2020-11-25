@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: traefikv2
+  name: traefikv2
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: kubernetes-dashboard
+  name: kubernetes-dashboard
