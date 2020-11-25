@@ -37,3 +37,20 @@ spec:
       port: 443
       scheme: http
 ---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: traefikv2
+spec:
+  entryPoints:
+    - http
+  routes:
+  - match: Host(`traefik.localhost`)
+    kind: Rule
+    middlewares:
+    services:
+    - name: traefik-internal
+      port: 8080
+      scheme: http
+---
