@@ -2,6 +2,12 @@
 
 This repo aims at showcasing how to create a basic viable [Kind](https://kind.sigs.k8s.io/) cluster with a dynamic volumes provisioner as well as a pre-configured [traefik v2](https://doc.traefik.io/traefik/v2.3/) ingress controller.
 
+## Install Kind
+Simply run
+```
+$ GO111MODULE="on" go get sigs.k8s.io/kind@v0.10.0
+```
+
 ## Create the cluster
 Just run:
 ```

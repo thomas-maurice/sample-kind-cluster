@@ -53,4 +53,3 @@ spec:
     - name: traefik-internal
       port: 8080
       scheme: http
----
