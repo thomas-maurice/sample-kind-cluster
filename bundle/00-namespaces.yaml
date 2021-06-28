@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    name: traefikv2
-  name: traefikv2
+    name: traefik
+  name: traefik
 ---
 apiVersion: v1
 kind: Namespace

@@ -3,7 +3,7 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  namespace: traefikv2
+  namespace: traefik
   name: ip-any
 spec:
   ipWhiteList:
@@ -13,7 +13,7 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  namespace: traefikv2
+  namespace: traefik
   name: redirect-https
 spec:
   redirectScheme:
@@ -41,7 +41,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: traefik-dashboard
-  namespace: traefikv2
+  namespace: traefik
 spec:
   entryPoints:
     - http

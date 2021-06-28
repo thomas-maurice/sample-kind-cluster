@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: traefikv2
+  namespace: traefik
   name: traefik-ingress-controller
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  namespace: traefikv2
+  namespace: traefik
   name: traefik
   labels:
     app: traefik
@@ -29,7 +29,7 @@ spec:
       serviceAccountName: traefik-ingress-controller
       containers:
         - name: traefik
-          image: traefik:v2.3
+          image: traefik:v2.4
           args:
             - --api.insecure
             - --api.dashboard=true

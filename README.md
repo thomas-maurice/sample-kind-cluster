@@ -5,7 +5,7 @@ This repo aims at showcasing how to create a basic viable [Kind](https://kind.si
 ## Install Kind
 Simply run
 ```
-$ GO111MODULE="on" go get sigs.k8s.io/kind@v0.10.0
+$ GO111MODULE="on" go get sigs.k8s.io/kind@v0.11.1
 ```
 
 ## Create the cluster
