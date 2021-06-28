@@ -26,6 +26,7 @@ helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
 helm install prometheus -n monitoring prometheus-community/kube-prometheus-stack
 
 sleep 5
-echo "http://grafana.localhost crededntials: "
-kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-password| cut -d: -f2|tr -d \  | base64 -d
-kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-user| cut -d: -f2|tr -d \  | base64 -d
+echo ""
+echo "Traefik: http://traefik.localhost"
+echo "Dashboard: http://dashboard.localhost"
+echo "http://grafana.localhost credentials: $(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-user| cut -d: -f2|tr -d \  | base64 -d):$(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-password| cut -d: -f2|tr -d \  | base64 -d)\n"
