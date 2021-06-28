@@ -53,3 +53,37 @@ spec:
     - name: traefik-internal
       port: 8080
       scheme: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  entryPoints:
+    - http
+  routes:
+  - match: Host(`grafana.localhost`)
+    kind: Rule
+    middlewares:
+    services:
+    - name: prometheus-grafana
+      port: 80
+      scheme: http
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  entryPoints:
+    - http
+  routes:
+  - match: Host(`prometheus.localhost`)
+    kind: Rule
+    middlewares:
+    services:
+    - name: prometheus-kube-prometheus-prometheus
+      port: 9090
+      scheme: http

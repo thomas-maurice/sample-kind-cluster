@@ -12,3 +12,10 @@ metadata:
   labels:
     name: kubernetes-dashboard
   name: kubernetes-dashboard
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: monitoring
+  name: monitoring
