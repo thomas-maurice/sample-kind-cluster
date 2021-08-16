@@ -1,0 +1,134 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: vault
+  name: vault
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  namespace: vault
+data:
+  config.hcl: |
+    ui = true
+    disable_mlock = true
+    api_addr = "http://vault.localhost"
+    storage "consul" {
+      address = "consul-server.consul:8500"
+      path    = "vault"
+    }
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_disable = true
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    k8s-app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: vault
+  template:
+    metadata:
+      labels:
+        k8s-app: vault
+        name: vault
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - image: vault:1.7.2
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 1000m
+            limits:
+              memory: 500Mi
+              cpu: 1000m
+          name: vault
+          env:
+            - name: VAULT_LOG_LEVEL
+              value: debug
+          volumeMounts:
+            - name: vault-config
+              mountPath: "/cfg/"
+              readOnly: true
+            - name: vault-data-pvc
+              mountPath: "/data/vault/"
+              readOnly: false
+          ports:
+            - name: http
+              containerPort: 8200
+            - name: cluster
+              containerPort: 8201
+          args:
+            - server
+            - -config=/cfg/config.hcl
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+      volumes:
+        - name: vault-config
+          configMap:
+            name: vault-config
+        - name: vault-credentials
+          secret:
+            secretName: vault-sa
+        - name: vault-data-pvc
+          persistentVolumeClaim:
+            claimName: vault-data-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: vault
+  name: vault-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    k8s-app: vault
+spec:
+  ports:
+    - port: 8200
+      name: http
+    - port: 8201
+      name: cluster
+  selector:
+    k8s-app: vault
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: vault-external
+  namespace: vault
+spec:
+  entryPoints:
+    - http
+  routes:
+    - match: Host(`vault.localhost`)
+      kind: Rule
+      middlewares: []
+      services:
+        - name: vault
+          port: 8200
+          scheme: http
