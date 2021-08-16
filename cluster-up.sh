@@ -23,10 +23,14 @@ helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --set serviceAccount.create=false \
     --set serviceAccount.name=admin-user \
     --set metricsScraper.enabled=true
-helm install prometheus -n monitoring prometheus-community/kube-prometheus-stack
+if ! [ "${INSTALL_PROM}" = "yes" ]; then
+    helm install prometheus -n monitoring prometheus-community/kube-prometheus-stack
+fi;
 
 sleep 5
 echo ""
 echo "Traefik: http://traefik.localhost"
 echo "Dashboard: http://dashboard.localhost"
-echo "http://grafana.localhost credentials: $(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-user| cut -d: -f2|tr -d \  | base64 -d):$(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-password| cut -d: -f2|tr -d \  | base64 -d)\n"
+if ! [ "${INSTALL_PROM}" = "yes" ]; then
+    echo "http://grafana.localhost credentials: $(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-user| cut -d: -f2|tr -d \  | base64 -d):$(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-password| cut -d: -f2|tr -d \  | base64 -d)\n"
+fi;
