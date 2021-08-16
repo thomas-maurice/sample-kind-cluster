@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # Create the cluster
-kind create cluster --config cluster.yaml
+if ! kind create cluster --config cluster.yaml; then
+    exit 1
+fi;
 
 # Untaint the master
-kubectl --context kind-kind taint nodes --all node-role.kubernetes.io/master-
+kubectl --context kind-kind taint nodes --all node-role.kubernetes.io/master- || true
 
 # Applies the manifests
+kubectl --context kind-kind apply -f bundle
+# yeah some CRDs are not available right away
+sleep 10
 kubectl --context kind-kind apply -f bundle
 
 # Installs the metrics server
