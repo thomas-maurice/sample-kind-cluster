@@ -14,6 +14,11 @@ kubectl --context kind-kind apply -f bundle
 sleep 10
 kubectl --context kind-kind apply -f bundle
 
+# give some crds time to register
+sleep 20
+# and try again
+kubectl --context kind-kind apply -f bundle
+
 # Installs the metrics server
 kubectl --context kind-kind apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 sleep 10
