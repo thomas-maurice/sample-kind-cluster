@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export INSTALL_PROM=yes
+
 # Create the cluster
 if ! kind create cluster --config cluster.yaml; then
     exit 1
@@ -36,6 +38,8 @@ helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
 if [ "${INSTALL_PROM}" = "yes" ]; then
     helm install prometheus -n monitoring prometheus-community/kube-prometheus-stack
 fi;
+
+kubectl apply -f vault
 
 sleep 5
 echo ""

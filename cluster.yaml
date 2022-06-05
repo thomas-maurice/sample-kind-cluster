@@ -3,7 +3,7 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
 - role: control-plane
-  image: kindest/node:v1.21.2
+  image: kindest/node:v1.23.6
   kubeadmConfigPatches:
   - |
     kind: InitConfiguration
@@ -24,8 +24,8 @@ nodes:
     hostPort: 8080
     protocol: TCP
 - role: worker
-  image: kindest/node:v1.21.2
+  image: kindest/node:v1.23.6
 - role: worker
-  image: kindest/node:v1.21.2
+  image: kindest/node:v1.23.6
 - role: worker
-  image: kindest/node:v1.21.2
+  image: kindest/node:v1.23.6
