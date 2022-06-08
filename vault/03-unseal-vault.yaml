@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: unseal-vault
+  namespace: vault
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: vault
+  name: unseal-vault
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: unseal-vault
+  namespace: vault
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: unseal-vault
+subjects:
+- kind: ServiceAccount
+  name: unseal-vault
+  namespace: vault
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: unseal-vault
+  namespace: vault
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: unseal-vault
+          containers:
+          - name: unseal-vault
+            image: mauricethomas/unseal-vault
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: VAULT_ADDR
+              value: http://vault:8200
+            command:
+            - /unseal-vault
+            - -k8s-in-cluster=true
+            - -k8s-ns=vault
+            - -k8s-secret=true
+            - -k8s-secret-name=vault-unlock
+          restartPolicy: OnFailure

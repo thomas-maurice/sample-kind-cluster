@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export INSTALL_PROM=yes
+export INSTALL_PROM=no
 
 # Create the cluster
 if ! kind create cluster --config cluster.yaml; then
@@ -17,7 +17,7 @@ sleep 10
 kubectl --context kind-kind apply -f bundle
 
 # give some crds time to register
-sleep 20
+sleep 10
 # and try again
 kubectl --context kind-kind apply -f bundle
 
@@ -48,3 +48,6 @@ echo "Dashboard: http://dashboard.localhost"
 if [ "${INSTALL_PROM}" = "yes" ]; then
     echo "http://grafana.localhost credentials: $(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-user| cut -d: -f2|tr -d \  | base64 -d):$(kubectl get secret -n monitoring prometheus-grafana -oyaml | grep admin-password| cut -d: -f2|tr -d \  | base64 -d)\n"
 fi;
+
+echo "The vault unlock secret (root token) lives in the vault/vault-unlock secret, to get the root token wait up to one minute then run"
+echo "  kubectl get secret -n vault vault-unlock -ojson | jq -r .data.value | base64 -d | jq -r .root_token"
